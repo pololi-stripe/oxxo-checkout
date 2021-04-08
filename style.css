@@ -78,3 +78,6 @@ h5 {
 #checkout-button:hover {
   opacity: 0.8;
 }
+#go-to-my-demo {
+  font-size: 28px;
+}

@@ -1,26 +1,38 @@
 GEM
-remote: https://rubygems.org/
-specs:
-  mustermann (1.1.1)
-    ruby2_keywords (~> 0.0.1)
-  rack (2.2.2)
-  rack-protection (2.0.8.1)
-    rack
-  ruby2_keywords (0.0.2)
-  sinatra (2.0.8.1)
-    mustermann (~> 1.0)
-    rack (~> 2.0)
-    rack-protection (= 2.0.8.1)
-    tilt (~> 2.0)
-  stripe (5.17.0)
-  tilt (2.0.10)
+  remote: https://rubygems.org/
+  specs:
+    dotenv (2.7.5)
+    ffi (1.15.0)
+    listen (3.5.1)
+      rb-fsevent (~> 0.10, >= 0.10.3)
+      rb-inotify (~> 0.9, >= 0.9.10)
+    mustermann (1.1.1)
+      ruby2_keywords (~> 0.0.1)
+    rack (2.2.3)
+    rack-protection (2.0.8.1)
+      rack
+    rb-fsevent (0.10.4)
+    rb-inotify (0.10.1)
+      ffi (~> 1.0)
+    rerun (0.13.1)
+      listen (~> 3.0)
+    ruby2_keywords (0.0.2)
+    sinatra (2.0.8.1)
+      mustermann (~> 1.0)
+      rack (~> 2.0)
+      rack-protection (= 2.0.8.1)
+      tilt (~> 2.0)
+    stripe (5.32.1)
+    tilt (2.0.10)
 
 PLATFORMS
-ruby
+  ruby
 
 DEPENDENCIES
-sinatra
-stripe
+  dotenv
+  rerun
+  sinatra
+  stripe
 
 BUNDLED WITH
- 1.16.1
+   2.1.2
