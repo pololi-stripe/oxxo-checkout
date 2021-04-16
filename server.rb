@@ -89,6 +89,7 @@ post '/create-checkout-session' do
   content_type 'application/json'
 
   session = Stripe::Checkout::Session.create(
+    billing_address_collection: 'required',
     payment_method_types: %w[card boleto],
     payment_method_options: {
       boleto: {
