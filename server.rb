@@ -58,7 +58,7 @@ post '/webhook' do
       logger.info('MY_LOG: case EVENT payment_intent.requires_action')
       payment_intent = event['data']['object']
 
-      if payment_intent.next_action.type == 'boleto_display_details'
+      if payment_intent.next_action&.type == 'boleto_display_details'
         payment_intent = Stripe::PaymentIntent.retrieve(
           {
             id: payment_intent.id,
@@ -67,15 +67,19 @@ post '/webhook' do
         )
 
         # TODO: send voucher emails
-        boleto_display_details = payment_intent.next_action.boleto_display_details
-        logger.info('MY_LOG: Sending voucher email')
-        logger.info("MY_LOG: Send to: #{payment_intent.customer.email}")
-        logger.info("MY_LOG: hosted_voucher_url: #{boleto_display_details.hosted_voucher_url}")
-        logger.info("MY_LOG: boleto number: #{boleto_display_details.number}")
-        logger.info("MY_LOG: expires_after: #{Time.at(boleto_display_details.expires_after)}")
+        boleto_display_details = payment_intent.next_action&.boleto_display_details
+        if boleto_display_details
+          logger.info('MY_LOG: Sending voucher email')
+          logger.info("MY_LOG: Send to: #{payment_intent.customer.email}")
+          logger.info("MY_LOG: hosted_voucher_url: #{boleto_display_details.hosted_voucher_url}")
+          logger.info("MY_LOG: boleto number: #{boleto_display_details.number}")
+          logger.info("MY_LOG: expires_after: #{Time.at(boleto_display_details.expires_after)}")
+        else
+          logger.error("MY_LOG: different next_action after retrieve #{payment_intent.next_action}")
+        end
       end
     else
-      logger.error('MY_LOG: WTF')
+      logger.error("MY_LOG: WTF even #{event['type']}")
     end
   rescue StandardError => e
     logger.error("MY_LOG: WTF #{e.inspect}")
