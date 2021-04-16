@@ -8,8 +8,6 @@ unless ENV['APP_ENV'] == 'production'
   Dotenv.load('.env')
 end
 Stripe.api_key = ENV['STRIPE_TEST_SECRET_KEY']
-Stripe.api_version = '2020-08-27;boleto_beta=v1'
-ENVPOINT_SECRET = ENV['WEBHOOK_SIGNING_SECRET']
 
 set :static, true
 set :public_folder, File.dirname(__FILE__)
@@ -57,25 +55,9 @@ post '/webhook' do
     when 'payment_intent.requires_action'
       logger.info('MY_LOG: case EVENT payment_intent.requires_action')
       payment_intent = event['data']['object']
-
-      if payment_intent.next_action.type == 'boleto_display_details'
-        payment_intent = Stripe::PaymentIntent.retrieve(
-          {
-            id: payment_intent.id,
-            expand: ['customer']
-          }
-        )
-
-        # TODO: send voucher emails
-        boleto_display_details = payment_intent.next_action.boleto_display_details
-        logger.info('MY_LOG: Sending voucher email')
-        logger.info("MY_LOG: Send to: #{payment_intent.customer.email}")
-        logger.info("MY_LOG: hosted_voucher_url: #{boleto_display_details.hosted_voucher_url}")
-        logger.info("MY_LOG: boleto number: #{boleto_display_details.number}")
-        logger.info("MY_LOG: expires_after: #{Time.at(boleto_display_details.expires_after)}")
-      end
+      logger.info("MY_LOG: payment_intent: #{payment_intent}")
     else
-      logger.error('MY_LOG: WTF')
+      logger.error("MY_LOG: WTF even #{event['type']}")
     end
   rescue StandardError => e
     logger.error("MY_LOG: WTF #{e.inspect}")
@@ -89,16 +71,17 @@ post '/create-checkout-session' do
   content_type 'application/json'
 
   session = Stripe::Checkout::Session.create(
-    payment_method_types: %w[card boleto],
+    billing_address_collection: 'required',
+    payment_method_types: %w[card oxxo],
     payment_method_options: {
-      boleto: {
-        expires_after_days: 14
+      oxxo: {
+        expires_after_days: 5
       }
     },
     line_items: [{
       price_data: {
         unit_amount: 2000,
-        currency: 'brl',
+        currency: 'mxn',
         product_data: {
           name: 'Stubborn Attachments',
           images: ['https://i.imgur.com/EHyR2nP.png']
