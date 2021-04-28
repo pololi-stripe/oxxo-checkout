@@ -8,8 +8,8 @@ unless ENV['APP_ENV'] == 'production'
   Dotenv.load('.env')
 end
 Stripe.api_key = ENV['STRIPE_TEST_SECRET_KEY']
-Stripe.api_version = '2020-08-27;boleto_beta=v1'
-ENVPOINT_SECRET = ENV['WEBHOOK_SIGNING_SECRET']
+# Stripe.api_version = '2020-08-27;boleto_beta=v1'
+# ENVPOINT_SECRET = ENV['WEBHOOK_SIGNING_SECRET']
 
 set :static, true
 set :public_folder, File.dirname(__FILE__)
@@ -94,16 +94,16 @@ post '/create-checkout-session' do
 
   session = Stripe::Checkout::Session.create(
     billing_address_collection: 'required',
-    payment_method_types: %w[card boleto],
+    payment_method_types: %w[card oxxo],
     payment_method_options: {
-      boleto: {
-        expires_after_days: 14
+      oxxo: {
+        expires_after_days: 5
       }
     },
     line_items: [{
       price_data: {
         unit_amount: 2000,
-        currency: 'brl',
+        currency: 'mxn',
         product_data: {
           name: 'Stubborn Attachments',
           images: ['https://i.imgur.com/EHyR2nP.png']
