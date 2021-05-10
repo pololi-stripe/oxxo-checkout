@@ -2,6 +2,10 @@
 
 Stripe Checkout is the fastest way to get started with payments. Included are some basic build and run scripts you can use to start up the application.
 
+## Demo Link
+
+https://oxxo-checkout.herokuapp.com/
+
 ## Running the sample
 
 1. Build the server
