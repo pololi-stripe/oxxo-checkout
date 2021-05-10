@@ -13,9 +13,8 @@ set :static, true
 set :public_folder, File.dirname(__FILE__)
 set :port, 4242
 
-HEROKU_DOMAIN = 'https://glacial-temple-49234.herokuapp.com'
 LOCAL_DOMAIN = "http://localhost:#{settings.port}"
-YOUR_DOMAIN = ENV['APP_ENV'] == 'production' ? HEROKU_DOMAIN : LOCAL_DOMAIN
+YOUR_DOMAIN = ENV['APP_ENV'] == 'production' ? ENV['HEROKU_DOMAIN'] : LOCAL_DOMAIN
 
 get '/' do
   erb :checkout, locals: { pubkey: ENV['STRIPE_TEST_PUBLIC_KEY'] }
