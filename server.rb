@@ -88,7 +88,11 @@ post '/create-checkout-session' do
       },
       quantity: 1
     }],
+    tax_id_collection: {
+      enabled: true
+    },
     mode: 'payment',
+    billing_address_collection: 'auto',
     success_url: YOUR_DOMAIN + '/success.html',
     cancel_url: YOUR_DOMAIN + '/cancel.html'
   )
