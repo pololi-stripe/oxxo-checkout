@@ -93,6 +93,7 @@ post '/create-checkout-session' do
     },
     mode: 'payment',
     billing_address_collection: 'auto',
+    shipping_address_collection: {allowed_countries: ['US', 'MX'] },
     success_url: YOUR_DOMAIN + '/success.html',
     cancel_url: YOUR_DOMAIN + '/cancel.html'
   )
