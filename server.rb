@@ -70,7 +70,7 @@ post '/create-checkout-session' do
   content_type 'application/json'
 
   session = Stripe::Checkout::Session.create(
-    billing_address_collection: 'required',
+    billing_address_collection: 'auto',
     payment_method_types: %w[card oxxo],
     payment_method_options: {
       oxxo: {
@@ -92,8 +92,7 @@ post '/create-checkout-session' do
       enabled: true
     },
     mode: 'payment',
-    billing_address_collection: 'auto',
-    shipping_address_collection: {allowed_countries: ['US', 'MX'] },
+    shipping_address_collection: { allowed_countries: %w[US MX] },
     success_url: YOUR_DOMAIN + '/success.html',
     cancel_url: YOUR_DOMAIN + '/cancel.html'
   )
@@ -101,4 +100,70 @@ post '/create-checkout-session' do
   {
     id: session.id
   }.to_json
+end
+
+get '/msi' do
+  erb :msi, locals: { pubkey: ENV['STRIPE_TEST_PUBLIC_KEY'] }
+end
+
+post '/collect_details' do
+  data = JSON.parse(request.body.read.to_s)
+
+  begin
+    # Create the PaymentIntent
+    intent = Stripe::PaymentIntent.create(
+      payment_method: data['payment_method_id'],
+      amount: 3099,
+      currency: 'mxn',
+      payment_method_options: {
+        card: {
+          installments: {
+            enabled: true
+          }
+        }
+      }
+    )
+  rescue Stripe::CardError => e
+    # Display error on client
+    # "e" contains a message explaining why the request failed
+    return [500, { error: e.message }.to_json]
+  end
+
+  return [200, {
+    intent_id: intent.id,
+    available_plans: intent.payment_method_options.card.installments.available_plans
+  }.to_json]
+end
+
+post '/confirm_payment' do
+  data = JSON.parse(request.body.read.to_s)
+
+  confirm_data = {}
+  if data.key?('selected_plan')
+    confirm_data = {
+      payment_method_options: {
+        card: {
+          installments: {
+            plan: data['selected_plan']
+          }
+        }
+      }
+    }
+  end
+
+  begin
+    # Create the PaymentIntent
+    intent = Stripe::PaymentIntent.confirm(
+      data['payment_intent_id'],
+      confirm_data
+    )
+  rescue Stripe::CardError => e
+    # Display error on client
+    return [500, { error: e.message }.to_json]
+  end
+
+  return [200, {
+    success: true,
+    status: intent.status
+  }.to_json]
 end
